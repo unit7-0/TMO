@@ -11,6 +11,10 @@ import java.awt.*;
  * Time: 18:44
  */
 public class Main {
+
+    /**
+     * Здесь создается основное окно приложения.
+     */
     public static void main(String[] args) {
         JFrame frame = new JFrame("Monte-Carlo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,7 +39,12 @@ public class Main {
         label.setText(monteCarlo());
     }
 
+    /**
+     * Рассчеты методом Монте-Карло
+     */
     private static String monteCarlo() {
+
+        // интенсивности подключений
         int[][] requests = {
                 { 18, 18, 16, 11, 8, 11, 13, 8, 17, 11, 14, 8, 11, 13 },
                 { 12, 15, 17, 20, 11, 12, 15, 11, 12, 19, 17, 17, 11, 15 },
@@ -44,6 +53,7 @@ public class Main {
                 { 19, 20, 16, 20, 11, 17, 19, 13, 23, 10, 11, 22, 17, 20 }
         };
 
+        // времена работы абонентов
         double[][] times = {
                 { 0.52, 0.08, 0.07, 0.08, 1.0, 0.13, 0.4, 0.67, 1.02, 0.17 },
                 { 0.85, 0.09, 0.41, 0.22, 0.06, 0.05, 0.27, 0.46, 0.06, 1.14 },
@@ -52,35 +62,47 @@ public class Main {
                 { 0.37, 0.35, 1.3, 0.06, 0.55, 0.62, 0.99, 0.23, 0.06, 1.16 }
         };
 
+        // сами абоненты
         Subscriber[] subscribers = new Subscriber[5];
         for(int i = 0; i < subscribers.length; ++i) {
             subscribers[i] = new Subscriber(requests[i], times[i], i);
             subscribers[i].nextTime(0);
         }
 
+        // счетчик текущего времени
         double currentTime = 0.0;
+
+        // время наблюдения
         double observeTime = 100.0;
 
+        // кол-во запросов
         int request = 0;
+
+        // кол-во отказов
         int fails = 0;
 
+        // терминал с тремя каналами
         Terminal terminal = new Terminal(3);
 
+        // выполняем в течение указанного времени
         while (currentTime < observeTime) {
 
+            // пробуем поставить на обработку абонента
             for(int i = 0; i < subscribers.length; ++i) {
 
-                    if(!terminal.isInQueue(subscribers[i]) && subscribers[i].getTimeIn() <= currentTime) {
+                if(!terminal.isInQueue(subscribers[i]) && subscribers[i].getTimeIn() <= currentTime) {
 
-                        if(!terminal.push(subscribers[i])) {
-                            subscribers[i].nextTime(currentTime);
-                            fails += 1;
-                        }
-
-                        request += 1;
+                    // если терминал занят, увеличиваем счетчик отказов
+                    if(!terminal.push(subscribers[i])) {
+                        subscribers[i].nextTime(currentTime);
+                        fails += 1;
                     }
+
+                    request += 1;
+                }
             }
 
+            // отключаем пользователей, закончивших работу и генерируем новое время
             for(int i = 0; i < subscribers.length; ++i) {
 
                 if(subscribers[i].getTimeOut() <= currentTime) {
@@ -105,7 +127,7 @@ public class Main {
         result.append("<br>Total number of denials: " + fails);
         result.append("<br>Total number of successful requests processed: " + (request - fails));
         result.append("<br>The probability of denial for three channels: " +
-                String.format("%.3f", (double) fails / request) + "");
+                String.format("%.3f", (double) fails / request));
 
         double lambda = 0;
         double muy = 0;
@@ -123,6 +145,9 @@ public class Main {
         return result.toString();
     }
 
+    /**
+     * вычисление аналитическим методом
+     */
     private static double analytical(double lambda, double muy, int count) {
         double p = Math.pow(lambda / muy, count) / factorial(count);
         double d = 0;

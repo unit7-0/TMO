@@ -12,6 +12,9 @@ public class Terminal {
         this.channels = new Subscriber[channels];
     }
 
+    /**
+     * попытка подключить абонента
+     */
     public boolean push(Subscriber subscriber) {
         if(busy == channels.length || isInQueue(subscriber))
             return false;
@@ -28,6 +31,9 @@ public class Terminal {
         return false;
     }
 
+    /**
+     * проверка на присутствие пользователя в системе
+     */
     public boolean isInQueue(Subscriber subscriber) {
         for(int i = 0; i < channels.length; ++i)
             if(channels[i] != null && channels[i].equals(subscriber))
@@ -36,6 +42,9 @@ public class Terminal {
         return false;
     }
 
+    /**
+     * отключение абонента
+     */
     public boolean pop(Subscriber subscriber) {
         for(int i = 0; i < channels.length; ++i) {
             if(channels[i] != null && channels[i].equals(subscriber)) {

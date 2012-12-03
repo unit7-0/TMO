@@ -21,6 +21,9 @@ public class Subscriber {
         this.id = id;
     }
 
+    /**
+     * генерация следующего времени подключения
+     */
     public void nextTime(double currentTime) {
         timeIn = -Math.log(Math.random()) / requestTime + currentTime;
         timeOut = workTime + timeIn;
@@ -50,10 +53,18 @@ public class Subscriber {
         return ((Subscriber) obj).id == id;
     }
 
+    // время входа в систему
     private double timeIn;
+
+    // время выхода из системы
     private double timeOut;
+
+    // средняя интенсивность запросов
     private double requestTime;
+
+    // среднее время работы
     private double workTime;
 
+    // id абонента
     private int id;
 }
